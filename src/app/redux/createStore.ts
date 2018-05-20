@@ -10,8 +10,8 @@ import { AllActions } from '../actions';
 
 export type IReduxStore = Store<IReduxState, AllActions>;
 
-export default function createStore(initialState: any = {}): IReduxStore {
-  const composeEnhancers = (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ as typeof compose) || compose;
+export default function createStore(initialState: Partial<IReduxState> = {}): IReduxStore {
+  const composeEnhancers = (__CLIENT__ && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) || compose;
   const store = reduxCreateStore(
     reducer,
     initialState,

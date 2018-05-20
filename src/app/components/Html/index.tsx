@@ -24,10 +24,10 @@ const Html = ({ assets, innerHTML, store }: IProps) => {
         {assets.runtime.js.map(path => (
           <script key={path} type="text/javascript" src={path} async defer />
         ))}
-        {assets['vendors~head'].js.map(path => (
+        {assets['vendors~bundle'].js.map(path => (
           <script key={path} type="text/javascript" src={path} async defer />
         ))}
-        {assets.head.js.map(path => (
+        {assets.bundle.js.map(path => (
           <script key={path} type="text/javascript" src={path} async defer />
         ))}
       </head>

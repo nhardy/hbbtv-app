@@ -1,3 +1,4 @@
+import { IHbbtvActions } from "./hbbtv";
 import { IRouteErrorAction } from "./routeError";
 
-export type AllActions = IRouteErrorAction;
+export type AllActions = IHbbtvActions | IRouteErrorAction;

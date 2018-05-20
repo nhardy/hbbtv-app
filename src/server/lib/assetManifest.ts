@@ -3,13 +3,13 @@ import * as fs from 'fs';
 export interface IAssetManifest {
   publicPath: '/static/',
   bundle: {
-    js: string;
+    js: string[];
   };
   runtime: {
-    js: string;
+    js: string[];
   };
   ['vendors~bundle']: {
-    js: string;
+    js: string[];
   };
 }
 

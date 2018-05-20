@@ -1,20 +1,9 @@
 /// <reference types="node" />
-/// <reference types="react" />
-/// <reference types="webpack" />
 /// <reference path="../node_modules/hbbtv-typings/index.d.ts" />
-
-declare module 'redux-connect' {
-  const ReduxAsyncConnect: React.ComponentClass<{ routes: any[] }>;
-  const asyncConnect: ClassDecorator;
-  const loadOnServer: (params: {
-    location: { pathname?: string },
-    routes: any[],
-    store?: { dispatch: (action: any) => any, getState: () => any },
-    helpers?: any,
-  }) => Promise<void>;
-  const reducer: (state: any, action: any) => any;
-  export { ReduxAsyncConnect, asyncConnect, loadOnServer, reducer };
-}
+/// <reference path="./nodemon.d.ts" />
+/// <reference path="./on-build-webpack.d.ts" />
+/// <reference path="./redux-connect.d.ts" />
+/// <reference path="./window.d.ts" />
 
 declare var __CLIENT__: boolean;
 declare var __SERVER__: boolean;
@@ -27,12 +16,6 @@ interface NodeModule {
   hot?: {
     accept(dependencies: string | string[], callback: () => void): void;
   };
-}
-
-interface Window {
-  __REDUX_DEVTOOLS_EXTENSION_COMPOSE__?: any;
-  __data: { [key: string]: any | undefined };
-  React?: typeof React;
 }
 
 interface Error {

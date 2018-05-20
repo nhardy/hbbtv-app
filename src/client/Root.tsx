@@ -1,9 +1,10 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
-import App from '../app/components/App';
 import { isForceRefreshRequired } from '../app/lib/device';
 import { IReduxStore } from '../app/redux/createStore';
+import { ReduxAsyncConnect } from 'redux-connect';
+import getRoutes from '../app/getRoutes';
 
 interface IProps {
   store: IReduxStore;
@@ -12,7 +13,7 @@ interface IProps {
 const Root = ({ store }: IProps) => (
   <Provider store={store} key="provider">
     <BrowserRouter basename="/" forceRefresh={isForceRefreshRequired()}>
-      <App />
+      <ReduxAsyncConnect routes={getRoutes(store)} />
     </BrowserRouter>
   </Provider>
 );
