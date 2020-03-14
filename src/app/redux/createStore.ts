@@ -7,6 +7,7 @@ import {
 import thunk from 'redux-thunk';
 import reducer, { IReduxState } from '../reducers';
 import { AllActions } from '../actions';
+import fetch from '../middleware/fetch';
 
 export type IReduxStore = Store<IReduxState, AllActions>;
 
@@ -18,6 +19,7 @@ export default function createStore(initialState: Partial<IReduxState> = {}): IR
     composeEnhancers(
       applyMiddleware(
         thunk,
+        fetch,
       ),
     ),
   );

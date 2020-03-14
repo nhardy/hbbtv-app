@@ -7,5 +7,5 @@ export function toHex(n: number): string {
 }
 
 export function zfill (s: number | string, length: number): string {
-  return `${s}`.padStart(length);
+  return `${s}`.padStart(length, '0');
 }

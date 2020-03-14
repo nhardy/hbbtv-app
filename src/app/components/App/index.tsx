@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import { Helmet } from 'react-helmet';
 import { connect } from 'react-redux';
+import { Route } from 'react-router';
 import { renderRoutes, RouteConfig } from 'react-router-config';
 import VideoBroadcast from '../VideoBroadcast';
 import { IReduxState } from '../../reducers';
 import { IRouteErrorState } from '../../reducers/routeError';
-import { Route } from 'react-router';
+import * as styles from './styles.styl';
+import { ErrorPage } from '../../pages/ErrorPage';
 
 interface IProps {
   route: { routes: RouteConfig[] };
@@ -24,7 +27,11 @@ class App extends Component<IProps, IState> {
         return (
           <React.Fragment>
             <VideoBroadcast />
-            {renderRoutes(route.routes)}
+            <Helmet>
+              <title>HbbTV App</title>
+              <body className={styles.body} />
+            </Helmet>
+            {routeError ? (<ErrorPage status={routeError.route.status} />) : renderRoutes(route.routes)}
           </React.Fragment>
         );
       }} />

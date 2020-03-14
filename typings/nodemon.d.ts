@@ -12,4 +12,3 @@ declare module 'nodemon' {
   const nodemon: (config: Nodemon.Config) => Nodemon.Monitor;
   export default nodemon;
 }
-

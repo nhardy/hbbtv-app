@@ -43,6 +43,7 @@ export default function main(req: Request, res: Response, next: NextFunction) {
       }
     })
     .catch((error: Error) => {
+      console.log('problem', error);
       next(error);
     });
 }

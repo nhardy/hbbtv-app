@@ -1,8 +1,10 @@
+/// <reference types="isomorphic-fetch" />
 /// <reference types="node" />
 /// <reference path="../node_modules/hbbtv-typings/index.d.ts" />
 /// <reference path="./nodemon.d.ts" />
 /// <reference path="./on-build-webpack.d.ts" />
 /// <reference path="./redux-connect.d.ts" />
+/// <reference path="./webpack.d.ts" />
 /// <reference path="./window.d.ts" />
 
 declare var __CLIENT__: boolean;
@@ -20,4 +22,5 @@ interface NodeModule {
 
 interface Error {
   status?: number;
+  response?: Response;
 }

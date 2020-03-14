@@ -1,3 +1,4 @@
+import autoprefixer from 'autoprefixer';
 import del from 'del';
 import * as fs from 'fs';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
@@ -5,6 +6,7 @@ import nodemon from 'nodemon';
 import OnBuildWebpackPlugin from 'on-build-webpack';
 import * as path from 'path';
 import selfsigned from 'selfsigned';
+import hash from 'string-hash';
 import * as webpack from 'webpack';
 import nodeExternals from 'webpack-node-externals';
 import generateBabelConfig from './babel.generate.config';
@@ -52,7 +54,95 @@ function ensureCertificate() {
 
 let monitor: Nodemon.Monitor | null = null;
 
-export default function webpackConfig({ client, env, serve }: IWebpackEnv): webpack.Configuration {
+const postcssOptions = {
+  ident: 'postcss',
+  sourceMap: true,
+  plugins() {
+    return [
+      autoprefixer({ browsers: ['last 2 versions'] }),
+    ];
+  },
+};
+
+const styleLoader = ({ production }: { production: boolean }) => {
+  if (production) return MiniCssExtractPlugin.loader;
+  return {
+    loader: 'style-loader',
+    options: { singleton: true },
+  };
+}
+
+const stylusLoaders = ({ production, client }: { production: boolean, client: boolean }) => {
+  const options = {
+    importLoaders: 2,
+    modules: true,
+    localIdentName: production
+      ? '[hash:base64:8]'
+      : '[path][name]--[local]--[hash:base64:5]',
+  };
+  if (client) return [
+    styleLoader({ production }),
+    {
+      loader: 'css-loader',
+      options,
+    },
+    {
+      loader: 'postcss-loader',
+      options: postcssOptions,
+    },
+    {
+      loader: 'stylus-loader',
+    },
+  ];
+  return [
+    {
+      loader: 'css-loader/locals',
+      options,
+    },
+    {
+      loader: 'postcss-loader',
+      options: postcssOptions,
+    },
+    {
+      loader: 'stylus-loader',
+    },
+  ];
+};
+
+const cssLoaders = ({ production, client }: { production: boolean, client: boolean}) => {
+  if (client) return [
+    styleLoader({ production }),
+    {
+      loader: 'css-loader',
+    },
+  ];
+  return [
+    {
+      loader: 'css-loader/locals',
+    },
+  ];
+};
+
+const svgoOptions = {
+  plugins: [],
+  floatPrecision: 2,
+};
+
+const svgoCleanupIdsPlugin = (resource: string) => ({
+  cleanupIDs: {
+    prefix: `svg-${hash(path.relative(__dirname, resource))}-`,
+  },
+});
+
+const urlLoader = {
+  loader: 'url-loader',
+  options: {
+    limit: 5120,
+    name: '[name]-[hash:6].[ext]',
+  },
+};
+
+export default function webpackConfig({ client = false, env, serve }: IWebpackEnv): webpack.Configuration {
   const production = env !== 'development';
   const mode = production ? 'production' : 'development';
 
@@ -97,6 +187,37 @@ export default function webpackConfig({ client, env, serve }: IWebpackEnv): webp
           ].filter(identity) as webpack.RuleSetUseItem[],
         },
         {
+          test: /\.styl$/,
+          use: stylusLoaders({ production, client }),
+        },
+        {
+          test: /\.css$/,
+          use: cssLoaders({ production, client }),
+        },
+        {
+          test: /\.(?:jpe?g|png|woff2?|ttf)(?:\?.*$|$)/,
+          use: [
+            urlLoader,
+          ]
+        },
+        {
+          test: /\.svg$/,
+          use: [
+            urlLoader,
+            ({ resource }) => ({
+              loader: 'svgo-loader',
+              options: {
+                ...svgoOptions,
+                plugins: [
+                  ...svgoOptions.plugins,
+                  svgoCleanupIdsPlugin(resource),
+                  { removeTitle: true },
+                ],
+              },
+            }),
+          ],
+        },
+        {
           test: /\.txt$/,
           use: [
             {
@@ -128,7 +249,7 @@ export default function webpackConfig({ client, env, serve }: IWebpackEnv): webp
 
     target: client ? 'web' : 'node',
 
-    externals: client? [] : [
+    externals: client ? [] : [
       nodeExternals({
         whitelist: [
           /lodash-es/,
@@ -144,6 +265,9 @@ export default function webpackConfig({ client, env, serve }: IWebpackEnv): webp
         __CLIENT__: client,
         __DEVELOPMENT__: !production,
         __SERVER__: !client,
+      }),
+      new webpack.ProvidePlugin({
+        fetch: 'isomorphic-fetch',
       }),
       client && !production && new webpack.HotModuleReplacementPlugin(),
       client && production && new MiniCssExtractPlugin({
@@ -180,6 +304,7 @@ export default function webpackConfig({ client, env, serve }: IWebpackEnv): webp
     resolve: {
       modules: [
         'node_modules',
+        path.join(__dirname, 'src'),
       ],
       extensions: ['.ts', '.tsx', '.js', '.json'],
     },
